@@ -128,7 +128,10 @@ const KIND_BOOLEAN = 1;
 const KIND_STRING = 2;
 const KIND_QUANTITY = 3;
 const KIND_NIL = 4;
+const WASI_ERRNO_NOTSUP = 58;
 const MODES: DimFormatMode[] = ["none", "auto", "scientific", "engineering"];
+
+const unsupportedWasiOperation = () => WASI_ERRNO_NOTSUP;
 
 let initPromise: Promise<void> | null = null;
 let runtime: DimRuntime | null = null;
@@ -179,17 +182,20 @@ function createWasiImports(
         }
         return 0;
       },
-      fd_close: () => 0,
-      fd_seek: () => 0,
-      fd_read: () => 0,
-      fd_pread: () => 0,
-      fd_pwrite: () => 0,
-      fd_fdstat_get: () => 0,
-      fd_filestat_get: () => 0,
-      path_filestat_get: () => 0,
-      fd_prestat_get: () => 0,
-      fd_prestat_dir_name: () => 0,
-      path_open: () => 0,
+      fd_close: unsupportedWasiOperation,
+      fd_seek: unsupportedWasiOperation,
+      fd_read: unsupportedWasiOperation,
+      fd_pread: unsupportedWasiOperation,
+      fd_pwrite: unsupportedWasiOperation,
+      fd_fdstat_get: unsupportedWasiOperation,
+      fd_fdstat_set_flags: unsupportedWasiOperation,
+      fd_filestat_set_size: unsupportedWasiOperation,
+      fd_filestat_get: unsupportedWasiOperation,
+      path_filestat_get: unsupportedWasiOperation,
+      fd_prestat_get: unsupportedWasiOperation,
+      fd_prestat_dir_name: unsupportedWasiOperation,
+      path_open: unsupportedWasiOperation,
+      // Empty arguments and environment are supported by reporting zero sizes.
       environ_sizes_get: (countPtr: number, bufSizePtr: number) => {
         const memory = getMemory();
         if (!memory) return 0;
@@ -208,8 +214,10 @@ function createWasiImports(
         return 0;
       },
       args_get: () => 0,
-      clock_time_get: () => 0,
-      proc_exit: () => 0,
+      clock_time_get: unsupportedWasiOperation,
+      proc_exit: (code: number) => {
+        throw new Error(`WASI process exited with code ${code}`);
+      },
     },
   };
 }
