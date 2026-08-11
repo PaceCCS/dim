@@ -1,5 +1,7 @@
 # dim
 
+⚠️ **August 11, 2026:** If you're using this library for a new project, you probably want to use [flower-dim](https://github.com/PaceCCS/flower-lab/tree/main/crates/flower-dim) instead.
+
 **dim** is a dimensional analysis and unit conversion library for [Zig](https://ziglang.org), with an optional CLI tool for quick calculations.
 
 It provides **compile-time dimensional safety** (you can’t add a pressure to a temperature), **unit conversions**, and **pretty-printing with SI prefixes and aliases**. The CLI lets you do quick calculations like:
